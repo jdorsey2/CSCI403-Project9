@@ -25,7 +25,7 @@ public class DigestAnswers {
                 int b = results.getInt("b");
                 String name = results.getString("colorname");
 
-                data.add(new ColorNamePair(new Color(r, g, b), name));
+                data.add(new ColorNamePair(new Color(r, g, b), name, 0));
             }
 
             System.out.println("Retrieved " + data.size() + " items.");
@@ -41,9 +41,10 @@ public class DigestAnswers {
 
             System.out.println("Writing data to file.");
             for (ColorNamePair datum : data) {
-                String s = datum.toString();
-                writer.write(s + "\n");
+                String toString = datum.toString();
+                writer.write(toString + "\n");
             }
+
             System.out.println("Finished writing data to file.");
             writer.close();
             System.out.println("Closed output file.");

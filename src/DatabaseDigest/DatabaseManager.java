@@ -10,11 +10,20 @@ public class DatabaseManager {
         try {
             Class.forName("org.postgresql.Driver");
             String connectString = "jdbc:postgresql://flowers.mines.edu/csci403";
-            Scanner keyboard = new Scanner(System.in);
-            System.out.print("Username: ");
-            String username = keyboard.nextLine();
-            System.out.print("Password: ");
-            String password = keyboard.nextLine();
+            String username;
+            String password;
+            if(System.console() == null){
+                Scanner keyboard = new Scanner(System.in);
+                System.out.print("Username: ");
+                username = keyboard.nextLine();
+                System.out.print("Password: ");
+                password = keyboard.nextLine();
+            } else {
+                System.out.print("Username: ");
+                username = System.console().readLine();
+                System.out.print("Password: ");
+                password = new String(System.console().readPassword());
+            }
 
             db = DriverManager.getConnection(connectString, username, password);
         } catch (SQLException | ClassNotFoundException e) {

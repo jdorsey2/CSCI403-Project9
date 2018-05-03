@@ -1,24 +1,30 @@
 package ColorClient.Data;
 
 public class ColorNamePair {
-    public Color color;
-    public String name;
+    private Color color;
+    private String name;
+    private int frequency;
 
-    public ColorNamePair(Color c, String name){
+    public ColorNamePair(Color c, String name, int frequency) {
         color = c;
         this.name = name;
+        this.frequency = frequency;
     }
 
-    public String getName(){
+    public String getName() {
         return name;
     }
 
-    public Color getColor(){
+    public Color getColor() {
         return color;
     }
 
+    public int getFrequency() {
+        return frequency;
+    }
+
     @Override
-    public String toString(){
+    public String toString() {
         return color + " " + name;
     }
 }

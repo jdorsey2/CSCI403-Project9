@@ -163,6 +163,29 @@ public class OcTree<T> {
         return cordMapper;
     }
 
+    // Returns [minimum number in a leaf node, maximum number in a leaf node, total number of leaf nodes]
+    public int[] getStatistics(int[] statsContainer) {
+        if (children == null) {
+            if (statsContainer[0] < contents.size()) {
+                statsContainer[0] = contents.size();
+            }
+
+            if (statsContainer[1] > contents.size()) {
+                statsContainer[1] = contents.size();
+            }
+
+            statsContainer[2]++;
+        } else {
+            for (OcTreeOctant octant : children.keySet()) {
+                children.get(octant).getStatistics(statsContainer);
+            }
+        }
+
+        return statsContainer;
+    }
+
+
+
     @Override
     public String toString() {
         return "min: " + min + ", max: " + max;
