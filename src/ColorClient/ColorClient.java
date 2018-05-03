@@ -11,7 +11,8 @@ import java.util.Comparator;
 import java.util.Scanner;
 
 public class ColorClient {
-    public static final String DATA_PREFIX = "../";
+    public static final String DATA_PREFIX = "./data/";
+    public static final String INPUT_FILE = "DigestOutput.txt";
     public static OcTree<ColorNamePair> data;
 
     public static void main(String[] args) {
@@ -20,20 +21,22 @@ public class ColorClient {
             return new Point3D(c.r, c.g, c.b);
         }, 3);
 
-        File dataFile = new File(DATA_PREFIX + "satfaces.txt");
+        File dataFile = new File(DATA_PREFIX + INPUT_FILE);
         Scanner scanner;
         try {
             scanner = new Scanner(dataFile);
         } catch (FileNotFoundException e) {
-            System.out.println("File " + DATA_PREFIX + "satfaces.txt not found");
+            System.out.println("File " + DATA_PREFIX + INPUT_FILE + " not found");
             return;
         }
 
         while (scanner.hasNextLine()) {
             String[] split = scanner.nextLine().split("] ");
-            Color c = Color.fromString(split[0]);
-            ColorNamePair pair = new ColorNamePair(c, split[1]);
-            data.add(pair);
+            if (split.length == 2) {
+                Color c = Color.fromString(split[0]);
+                ColorNamePair pair = new ColorNamePair(c, split[1]);
+                data.add(pair);
+            }
         }
 
         System.out.println("Done loading " + data.size() + " color-name pairs.");

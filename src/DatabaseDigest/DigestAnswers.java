@@ -1,31 +1,63 @@
 package DatabaseDigest;
 
+import ColorClient.Data.Color;
+import ColorClient.Data.ColorNamePair;
+
+import java.io.*;
 import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DigestAnswers {
+    public static final String DATA_PREFIX = "./data/";
+    private static final String OUTPUT_FILE = "DigestOutput.txt";
+
     public static void main(String[] args) throws ClassNotFoundException {
-        Connection db = connectToDb();
-    }
-
-    public static Connection connectToDb() {
-        Connection db = null;
+        Connection db = DatabaseManager.connect();
+        ResultSet results = DatabaseManager.runQuery(db, "SELECT r, g, b, colorname FROM jdorsey.answers;");
+        List<ColorNamePair> data = new ArrayList<>();
         try {
-            Class.forName("org.postgresql.Driver");
-            String connectString = "jdbc:postgresql://flowers.mines.edu/csci403";
-            Scanner keyboard = new Scanner(System.in);
-            System.out.print("Username: ");
-            String username = keyboard.nextLine();
-            System.out.print("Password: ");
-            String password = keyboard.nextLine();
+            while (results.next()) {
+                int r = results.getInt("r");
+                int g = results.getInt("g");
+                int b = results.getInt("b");
+                String name = results.getString("colorname");
 
-            db = DriverManager.getConnection(connectString, username, password);
-        } catch (SQLException | ClassNotFoundException e) {
-            System.out.println("Error connecting to database: " + e);
-            System.exit(1);
+                data.add(new ColorNamePair(new Color(r, g, b), name));
+            }
+
+            System.out.println("Retrieved " + data.size() + " items.");
+
+            System.out.println("Opening output file " + DATA_PREFIX + OUTPUT_FILE);
+            File outFile = new File(DATA_PREFIX + OUTPUT_FILE);
+            if (!outFile.exists()) {
+                if (!outFile.createNewFile()) {
+                    throw new IOException("Unable to create output file " + outFile.getAbsolutePath());
+                }
+            }
+            BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
+
+            System.out.println("Writing data to file.");
+            for (ColorNamePair datum : data) {
+                String s = datum.toString();
+                writer.write(s + "\n");
+            }
+            System.out.println("Finished writing data to file.");
+            writer.close();
+            System.out.println("Closed output file.");
+
+            BufferedReader reader = new BufferedReader(new FileReader(outFile));
+            for(int i = 0; i < 100; i++){
+                System.out.println(reader.readLine());
+            }
+            reader.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println(e.getSQLState());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return db;
     }
 }

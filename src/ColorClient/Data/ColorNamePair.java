@@ -19,6 +19,6 @@ public class ColorNamePair {
 
     @Override
     public String toString(){
-        return color + ", " + name;
+        return color + " " + name;
     }
 }
