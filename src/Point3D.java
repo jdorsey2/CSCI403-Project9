@@ -89,4 +89,12 @@ public class Point3D {
     public static boolean inRange(Point3D min, Point3D max, Point3D test) {
         return test.gte(min) && test.lt(max);
     }
+
+    public static double distance(Point3D a, Point3D b) {
+        return Math.sqrt(a.x * b.x + a.y * b.y + a.z * b.z);
+    }
+
+    public static double manhattanDistance(Point3D a, Point3D b) {
+        return Math.abs(a.x - b.x) + Math.abs(a.y - b.y) + Math.abs(a.z - b.z);
+    }
 }

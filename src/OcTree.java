@@ -1,12 +1,7 @@
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 public class OcTree<T> {
-    private static int MAX_PER_NODE = 8;
-
     public enum OcTreeOctant {
         LEFTBACKDOWN(),
         LEFTBACKUP(),
@@ -35,8 +30,11 @@ public class OcTree<T> {
         this.max = max;
         this.parent = parent;
         this.cordMapper = cordMapper;
-        this.contents = new HashSet<>();
+        this.contents = new ArrayList<>();
         this.remainingDepth = remainingDepth;
+        if (remainingDepth != 0) {
+            buildSubtrees();
+        }
     }
 
     public OcTree<T> getChild(OcTreeOctant o) {
@@ -47,6 +45,18 @@ public class OcTree<T> {
         return parent;
     }
 
+    public OcTree<T> getOctantBy(Point3D point) {
+        if (children != null) {
+            for (OcTreeOctant octant : children.keySet()) {
+                OcTree<T> tree = children.get(octant);
+                if (Point3D.inRange(tree.min, tree.max, point)) {
+                    return tree.getOctantBy(point);
+                }
+            }
+        }
+        return this;
+    }
+
     public void add(T obj) {
         if (remainingDepth == 0) {
             contents.add(obj);
@@ -55,49 +65,8 @@ public class OcTree<T> {
                 contents.add(obj);
                 Map<T, Point3D> pointMap = new HashMap<>();
                 contents.forEach(item -> pointMap.put(item, cordMapper.apply(item)));
-                children = new HashMap<>();
 
-                double sideLength = max.subtract(min).divide(2).getX();
-                Point3D center = min.add(max.subtract(min).divide(2));
-
-                OcTree<T> leftBackDown = new OcTree<>(min, center, cordMapper, this, remainingDepth - 1);
-
-                OcTree<T> leftBackUp = new OcTree<>(
-                        min.add(new Point3D(0, 0, sideLength)),
-                        center.add(new Point3D(0, 0, sideLength)), cordMapper, this, remainingDepth - 1);
-
-                OcTree<T> leftFrontDown = new OcTree<>(
-                        min.add(new Point3D(0, sideLength, 0)),
-                        center.add(new Point3D(0, sideLength, 0)), cordMapper, this, remainingDepth - 1);
-
-                OcTree<T> leftFrontUp = new OcTree<>(
-                        min.add(new Point3D(0, sideLength, sideLength)),
-                        center.add(new Point3D(0, sideLength, sideLength)), cordMapper, this, remainingDepth - 1);
-
-                OcTree<T> rightBackDown = new OcTree<>(
-                        min.add(new Point3D(sideLength, 0, 0)),
-                        center.add(new Point3D(sideLength, 0, 0)), cordMapper, this, remainingDepth - 1);
-
-                OcTree<T> rightBackUp = new OcTree<>(
-                        min.add(new Point3D(sideLength, 0, sideLength)),
-                        center.add(new Point3D(sideLength, 0, sideLength)), cordMapper, this, remainingDepth - 1);
-
-                OcTree<T> rightFrontDown = new OcTree<>(
-                        min.add(new Point3D(sideLength, sideLength, 0)),
-                        center.add(new Point3D(sideLength, sideLength, 0)), cordMapper, this, remainingDepth - 1);
-
-                OcTree<T> rightFrontUp = new OcTree<>(
-                        min.add(new Point3D(sideLength, sideLength, sideLength)),
-                        center.add(new Point3D(sideLength, sideLength, sideLength)), cordMapper, this, remainingDepth - 1);
-
-                children.put(OcTreeOctant.LEFTBACKDOWN, leftBackDown);
-                children.put(OcTreeOctant.LEFTBACKUP, leftBackUp);
-                children.put(OcTreeOctant.LEFTFRONTDOWN, leftFrontDown);
-                children.put(OcTreeOctant.LEFTFRONTUP, leftFrontUp);
-                children.put(OcTreeOctant.RIGHTBACKDOWN, rightBackDown);
-                children.put(OcTreeOctant.RIGHTBACKUP, rightBackUp);
-                children.put(OcTreeOctant.RIGHTFRONTDOWN, rightFrontDown);
-                children.put(OcTreeOctant.RIGHTFRONTUP, rightFrontUp);
+                buildSubtrees();
 
                 while (!contents.isEmpty()) {
                     T item = contents.iterator().next();
@@ -128,6 +97,52 @@ public class OcTree<T> {
         }
     }
 
+    private void buildSubtrees() {
+        children = new HashMap<>();
+
+        double sideLength = max.subtract(min).divide(2).getX();
+        Point3D center = min.add(max.subtract(min).divide(2));
+
+        OcTree<T> leftBackDown = new OcTree<>(min, center, cordMapper, this, remainingDepth - 1);
+
+        OcTree<T> leftBackUp = new OcTree<>(
+                min.add(new Point3D(0, 0, sideLength)),
+                center.add(new Point3D(0, 0, sideLength)), cordMapper, this, remainingDepth - 1);
+
+        OcTree<T> leftFrontDown = new OcTree<>(
+                min.add(new Point3D(0, sideLength, 0)),
+                center.add(new Point3D(0, sideLength, 0)), cordMapper, this, remainingDepth - 1);
+
+        OcTree<T> leftFrontUp = new OcTree<>(
+                min.add(new Point3D(0, sideLength, sideLength)),
+                center.add(new Point3D(0, sideLength, sideLength)), cordMapper, this, remainingDepth - 1);
+
+        OcTree<T> rightBackDown = new OcTree<>(
+                min.add(new Point3D(sideLength, 0, 0)),
+                center.add(new Point3D(sideLength, 0, 0)), cordMapper, this, remainingDepth - 1);
+
+        OcTree<T> rightBackUp = new OcTree<>(
+                min.add(new Point3D(sideLength, 0, sideLength)),
+                center.add(new Point3D(sideLength, 0, sideLength)), cordMapper, this, remainingDepth - 1);
+
+        OcTree<T> rightFrontDown = new OcTree<>(
+                min.add(new Point3D(sideLength, sideLength, 0)),
+                center.add(new Point3D(sideLength, sideLength, 0)), cordMapper, this, remainingDepth - 1);
+
+        OcTree<T> rightFrontUp = new OcTree<>(
+                min.add(new Point3D(sideLength, sideLength, sideLength)),
+                center.add(new Point3D(sideLength, sideLength, sideLength)), cordMapper, this, remainingDepth - 1);
+
+        children.put(OcTreeOctant.LEFTBACKDOWN, leftBackDown);
+        children.put(OcTreeOctant.LEFTBACKUP, leftBackUp);
+        children.put(OcTreeOctant.LEFTFRONTDOWN, leftFrontDown);
+        children.put(OcTreeOctant.LEFTFRONTUP, leftFrontUp);
+        children.put(OcTreeOctant.RIGHTBACKDOWN, rightBackDown);
+        children.put(OcTreeOctant.RIGHTBACKUP, rightBackUp);
+        children.put(OcTreeOctant.RIGHTFRONTDOWN, rightFrontDown);
+        children.put(OcTreeOctant.RIGHTFRONTUP, rightFrontUp);
+    }
+
     public int size() {
         int size = contents.size();
         if (children != null) {
@@ -136,5 +151,18 @@ public class OcTree<T> {
             }
         }
         return size;
+    }
+
+    public Collection<T> getContents() {
+        return contents;
+    }
+
+    public Function<T, Point3D> getCordMapper() {
+        return cordMapper;
+    }
+
+    @Override
+    public String toString() {
+        return "min: " + min + ", max: " + max;
     }
 }

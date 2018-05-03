@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Comparator;
 import java.util.Scanner;
 import java.util.function.Function;
 
@@ -30,5 +31,20 @@ public class ColorSearch {
         }
 
         System.out.println("Done loading " + data.size() + " color-name pairs.");
+        for (int i = 0; i < 100; i++) {
+            double r = Math.random() * 256;
+            double g = Math.random() * 256;
+            double b = Math.random() * 256;
+
+            Point3D color = new Point3D(r, g, b);
+            OcTree<ColorNamePair> tree = data.getOctantBy(color);
+            if (tree != null) {
+                System.out.println("Colors near: " + color);
+                tree.getContents().stream()
+                        .sorted(Comparator.comparing(pair -> Point3D.manhattanDistance(color, tree.getCordMapper().apply(pair))))
+                        .limit(10)
+                        .forEach(System.out::println);
+            }
+        }
     }
 }
