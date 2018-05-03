@@ -81,6 +81,11 @@ public class Point3D {
         return x < other.x && y < other.y && z < other.z;
     }
 
+    @Override
+    public String toString() {
+        return "[" + x + ", " + y + ", " + z + "]";
+    }
+
     public static boolean inRange(Point3D min, Point3D max, Point3D test) {
         return test.gte(min) && test.lt(max);
     }

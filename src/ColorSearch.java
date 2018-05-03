@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
+import java.util.function.Function;
 
 public class ColorSearch {
     public static final String DATA_PREFIX = "../";
@@ -10,7 +11,7 @@ public class ColorSearch {
         data = new OcTree<>(Point3D.zero(), new Point3D(255), pair -> {
             Color c = pair.getColor();
             return new Point3D(c.r, c.g, c.b);
-        });
+        }, 3);
 
         File dataFile = new File(DATA_PREFIX + "satfaces.txt");
         Scanner scanner;
