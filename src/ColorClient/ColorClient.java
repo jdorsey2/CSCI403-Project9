@@ -1,10 +1,16 @@
+package ColorClient;
+
+import ColorClient.Data.Color;
+import ColorClient.Data.ColorNamePair;
+import ColorClient.Data.OcTree;
+import ColorClient.Data.Point3D;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Comparator;
 import java.util.Scanner;
-import java.util.function.Function;
 
-public class ColorSearch {
+public class ColorClient {
     public static final String DATA_PREFIX = "../";
     public static OcTree<ColorNamePair> data;
 
@@ -41,7 +47,7 @@ public class ColorSearch {
             if (tree != null) {
                 System.out.println("Colors near: " + color);
                 tree.getContents().stream()
-                        .sorted(Comparator.comparing(pair -> Point3D.manhattanDistance(color, tree.getCordMapper().apply(pair))))
+                        .sorted(Comparator.comparing(pair -> Point3D.distance(color, tree.getCordMapper().apply(pair))))
                         .limit(10)
                         .forEach(System.out::println);
             }

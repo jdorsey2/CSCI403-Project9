@@ -1,3 +1,5 @@
+package ColorClient.Data;
+
 public class Point3D {
     private double x;
     private double y;

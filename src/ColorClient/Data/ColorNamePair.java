@@ -1,3 +1,5 @@
+package ColorClient.Data;
+
 public class ColorNamePair {
     public Color color;
     public String name;

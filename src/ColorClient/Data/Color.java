@@ -1,3 +1,5 @@
+package ColorClient.Data;
+
 import java.util.Objects;
 
 public class Color {
