@@ -6,25 +6,23 @@ import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.layout.Background;
-import javafx.stage.FileChooser;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.ResourceBundle;
-import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class ColorClientController implements Initializable {
     public static final String DATA_PREFIX = "./data/";
+    public static final int TABLE_MAX_SIZE = 1000;
     public static OcTree<ColorNamePair> data;
 
     public static final String COLORS_BY_NAME =
             "SELECT answers.r, answers.g, answers.b, names.colorname, names.numusers FROM jdorsey.answers, jdorsey.names WHERE names.colorname = answers.colorname";
+    public static final String COLORS_BY_NAME_FREQ = "SELECT AVG(answers.r) AS r, AVG(answers.g) AS g, AVG(answers.b) AS b, names.numusers, names.colorname FROM jdorsey.answers, jdorsey.names WHERE answers.colorname = names.colorname AND names.numusers > 1 GROUP BY names.colorname, names.numusers";
 
     @FXML
     private ColorPicker picker;
@@ -58,11 +56,15 @@ public class ColorClientController implements Initializable {
     private void updateTable() {
         javafx.scene.paint.Color c = picker.getValue();
         logToConsole("Retrieving OcTree leaf for " + c);
-        OcTree<ColorNamePair> tree = data.getOctantBy(data.getCordMapper().apply(ColorUtils.toColorNamePair(c)));
+        ColorNamePair pickerPair = ColorUtils.toColorNamePair(c);
+        OcTree<ColorNamePair> tree = data.getOctantBy(data.getCordMapper().apply(pickerPair));
+        Point3D pickerPosition = tree.getCordMapper().apply(pickerPair);
         logToConsole("Updating table...");
         table.getItems().clear();
         // Convert the items to wrapped items
         Collection<ColorNamePairWrapper> items = tree.collectValues().parallelStream()
+                .limit(TABLE_MAX_SIZE)
+                .sorted(Comparator.comparing(pair -> Point3D.distance(pickerPosition, tree.getCordMapper().apply(pair))))
                 .map(ColorNamePairWrapper::new)
                 .collect(Collectors.toList());
         table.getItems().addAll(items);
@@ -71,13 +73,14 @@ public class ColorClientController implements Initializable {
 
     private void logToConsole(String toLog) {
         console.setText(console.getText() + toLog + "\n");
+        System.out.println(toLog);
     }
 
     @FXML
     private void loadFromDatabase() {
         logToConsole("OcTree cleared... querying database.");
         data.clear();
-        ResultSet colors = DatabaseManager.runQuery(COLORS_BY_NAME);
+        ResultSet colors = DatabaseManager.runQuery(COLORS_BY_NAME_FREQ);
         try {
             while (colors.next()) {
                 int r = colors.getInt("r");
