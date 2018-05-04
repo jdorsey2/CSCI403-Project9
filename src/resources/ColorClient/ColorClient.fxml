@@ -1,0 +1,27 @@
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="ColorClient.ColorClientController">
+    <left>
+        <BorderPane prefWidth="250">
+            <top>
+                <VBox>
+                    <ColorPicker fx:id="picker" onAction="#colorPickerAction"/>
+                    <Button text="Load from DB" onAction="#loadFromDatabase"/>
+                </VBox>
+            </top>
+            <center>
+                <TextArea fx:id="console" editable="false"/>
+            </center>
+        </BorderPane>
+    </left>
+    <center>
+        <TableView fx:id="table">
+            <columns>
+                <TableColumn text="Color" sortable="false" fx:id="colorColumn"/>
+                <TableColumn text="Name" fx:id="nameColumn"/>
+                <TableColumn text="Frequency" fx:id="frequencyColumn"/>
+            </columns>
+        </TableView>
+    </center>
+</BorderPane>

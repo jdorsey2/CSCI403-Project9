@@ -36,7 +36,7 @@ public class ColorUtils {
             hue = 4.0 + ((double) (c.r - c.g)) / (max - min);
         }
 
-        hue /= 6.0;
+        hue /= 60.0;
 
         double luminance = (min + max) / 2.;
 
@@ -48,5 +48,24 @@ public class ColorUtils {
         }
 
         return new Point3D(hue, saturation, luminance);
+    }
+
+    public static ColorNamePair toColorNamePair(javafx.scene.paint.Color c) {
+        return new ColorNamePair(new Color(c.getRed(), c.getGreen(), c.getBlue()), "", 0);
+    }
+
+    public static Color fromFxColor(javafx.scene.paint.Color c) {
+        return new Color(c.getRed(), c.getGreen(), c.getBlue());
+    }
+
+    public static String toHexColor(javafx.scene.paint.Color c) {
+        int r = (int)(c.getRed()*256.);
+        int g = (int)(c.getGreen()*256.);
+        int b = (int)(c.getBlue()*256.);
+        return String.format("#%02X%02X%02X", r, g, b);
+    }
+
+    public static String toHexColor(Color c) {
+        return String.format("#%02X%02X%02X", c.r, c.g, c.b);
     }
 }

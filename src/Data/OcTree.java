@@ -1,6 +1,7 @@
 package Data;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class OcTree<T> {
@@ -99,6 +100,13 @@ public class OcTree<T> {
         }
     }
 
+    public void clear() {
+        contents.clear();
+        if (children != null) {
+            forEachChild(OcTree::clear);
+        }
+    }
+
     private void buildSubtrees() {
         children = new HashMap<>();
 
@@ -176,9 +184,7 @@ public class OcTree<T> {
 
             statsContainer[2]++;
         } else {
-            for (OcTreeOctant octant : children.keySet()) {
-                children.get(octant).getStatistics(statsContainer);
-            }
+            forEachChild(child -> child.getStatistics(statsContainer));
         }
 
         return statsContainer;
@@ -187,15 +193,29 @@ public class OcTree<T> {
     public Collection<T> collectValues() {
         Collection<T> items = new ArrayList<>();
         if (children != null) {
-            for(OcTreeOctant octant : children.keySet()) {
-                items.addAll(children.get(octant).collectValues());
-            }
+            forEachChild(child -> items.addAll(child.collectValues()));
         } else {
-            if(contents.size() > 0){
+            if (contents.size() > 0) {
                 items.addAll(contents);
             }
         }
         return items;
+    }
+
+    public void forEachChild(Consumer<OcTree<T>> c) {
+        for (OcTreeOctant octant : children.keySet()) {
+            c.accept(children.get(octant));
+        }
+    }
+
+    public void printStats() {
+        int[] stats = {0, 0, 0};
+        getStatistics(stats);
+        System.out.println("Minimum number in leaf node: " + stats[0]);
+        System.out.println("Maximum number in leaf node: " + stats[1]);
+        System.out.println("Number of leaf nodes: " + stats[2]);
+        System.out.println("Average colors per leaf: " + ((double) size()) / ((double) stats[2]));
+        System.out.println("Total items: " + size());
     }
 
     @Override

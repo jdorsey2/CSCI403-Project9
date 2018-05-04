@@ -13,6 +13,10 @@ public class Color {
         this.b = b;
     }
 
+    public Color(double r, double g, double b) {
+        this((int)(r*256.), (int)(g*256.), (int)(b*256.));
+    }
+
     public static Color fromString(String s) {
         String color = s.replaceAll("[^0-9.]", " ");
         String[] components = color.split(" ");

@@ -19,8 +19,7 @@ public class DigestAnswers {
     private static final String OUTPUT_FILE = "DigestOutput.txt";
 
     public static void main(String[] args) throws ClassNotFoundException {
-        Connection db = DatabaseManager.connect();
-        ResultSet results = DatabaseManager.runQuery(db, "SELECT r, g, b, colorname FROM jdorsey.answers;");
+        ResultSet results = DatabaseManager.runQuery("SELECT r, g, b, colorname FROM jdorsey.answers;");
         List<ColorNamePair> data = new ArrayList<>();
         try {
             while (results.next()) {
