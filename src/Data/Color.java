@@ -1,4 +1,4 @@
-package ColorClient.Data;
+package Data;
 
 import java.util.Objects;
 

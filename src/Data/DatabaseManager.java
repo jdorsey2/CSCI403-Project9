@@ -1,4 +1,4 @@
-package DatabaseDigest;
+package Data;
 
 import java.sql.*;
 import java.util.Arrays;

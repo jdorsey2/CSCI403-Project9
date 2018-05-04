@@ -1,4 +1,4 @@
-package ColorClient.Data;
+package Data;
 
 public class ColorNamePair {
     private Color color;

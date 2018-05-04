@@ -1,7 +1,7 @@
-package DatabaseDigest;
+package Data;
 
-import ColorClient.Data.ColorNamePair;
-import ColorClient.Data.Point3D;
+import Data.ColorNamePair;
+import Data.Point3D;
 
 import java.io.BufferedWriter;
 import java.io.File;

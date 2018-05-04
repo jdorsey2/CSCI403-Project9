@@ -1,7 +1,8 @@
 package DatabaseDigest;
 
-import ColorClient.Data.Color;
-import ColorClient.Data.ColorNamePair;
+import Data.Color;
+import Data.ColorNamePair;
+import Data.DatabaseManager;
 
 import java.io.*;
 import java.sql.Connection;
@@ -10,6 +11,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Takes all the rgb values and names from the answers and writes them to a file.
+ */
 public class DigestAnswers {
     public static final String DATA_PREFIX = "./data/";
     private static final String OUTPUT_FILE = "DigestOutput.txt";

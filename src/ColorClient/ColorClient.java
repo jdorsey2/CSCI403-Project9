@@ -1,16 +1,14 @@
 package ColorClient;
 
-import ColorClient.Data.Color;
-import ColorClient.Data.ColorNamePair;
-import ColorClient.Data.OcTree;
-import ColorClient.Data.Point3D;
-import DatabaseDigest.DatabaseManager;
-import DatabaseDigest.PLYExporter;
+import Data.Color;
+import Data.ColorNamePair;
+import Data.OcTree;
+import Data.Point3D;
+import Data.DatabaseManager;
+import Data.PLYExporter;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
-import javax.swing.*;
-import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.Connection;
