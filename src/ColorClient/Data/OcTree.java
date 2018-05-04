@@ -166,11 +166,11 @@ public class OcTree<T> {
     // Returns [minimum number in a leaf node, maximum number in a leaf node, total number of leaf nodes]
     public int[] getStatistics(int[] statsContainer) {
         if (children == null) {
-            if (statsContainer[0] < contents.size()) {
+            if (statsContainer[0] > contents.size()) {
                 statsContainer[0] = contents.size();
             }
 
-            if (statsContainer[1] > contents.size()) {
+            if (statsContainer[1] < contents.size()) {
                 statsContainer[1] = contents.size();
             }
 
@@ -184,7 +184,19 @@ public class OcTree<T> {
         return statsContainer;
     }
 
-
+    public Collection<T> collectValues() {
+        Collection<T> items = new ArrayList<>();
+        if (children != null) {
+            for(OcTreeOctant octant : children.keySet()) {
+                items.addAll(children.get(octant).collectValues());
+            }
+        } else {
+            if(contents.size() > 0){
+                items.addAll(contents);
+            }
+        }
+        return items;
+    }
 
     @Override
     public String toString() {
