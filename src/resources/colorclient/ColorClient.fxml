@@ -11,11 +11,13 @@
                         <ToggleGroup fx:id="searchToggle"/>
                     </fx:define>
                     <HBox>
-                        <ToggleButton fx:id="colorButton" prefWidth="125" toggleGroup="$searchToggle" selected="true" text="Color"/>
+                        <ToggleButton fx:id="colorButton" prefWidth="125" toggleGroup="$searchToggle" selected="true"
+                                      text="Color"/>
                         <ToggleButton fx:id="textButton" prefWidth="125" toggleGroup="$searchToggle" text="Text"/>
                     </HBox>
                     <ColorPicker fx:id="picker" prefWidth="250" onAction="#colorPickerAction"/>
-                    <TextField fx:id="textSearch" promptText="Enter Search Text" prefWidth="250" visible="false" onKeyReleased="#textSearchAction"/>
+                    <TextField fx:id="textSearch" promptText="Enter Search Text" prefWidth="250" visible="false"
+                               onKeyReleased="#textSearchAction"/>
                     <Button text="Load from DB" prefWidth="250" onAction="#loadFromDatabase"/>
                 </VBox>
             </top>
@@ -27,9 +29,9 @@
     <center>
         <TableView fx:id="table">
             <columns>
-                <TableColumn text="Color" sortable="false" fx:id="colorColumn"/>
-                <TableColumn text="Name" fx:id="nameColumn"/>
-                <TableColumn text="Frequency" fx:id="frequencyColumn"/>
+                <TableColumn text="Color" prefWidth="100" sortable="false" fx:id="colorColumn"/>
+                <TableColumn text="Name" prefWidth="320" fx:id="nameColumn"/>
+                <TableColumn text="Frequency" prefWidth="120" fx:id="frequencyColumn"/>
             </columns>
         </TableView>
     </center>

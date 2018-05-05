@@ -44,6 +44,17 @@ public class OcTree<T> {
         return children.get(o);
     }
 
+    public OcTreeOctant getDirectRelationship(OcTree<T> tree) {
+        if (children.containsValue(tree)) {
+            for (OcTreeOctant octant : children.keySet()) {
+                if (getChild(octant) == tree) {
+                    return octant;
+                }
+            }
+        }
+        return null;
+    }
+
     public OcTree<T> getParent() {
         return parent;
     }
@@ -58,6 +69,52 @@ public class OcTree<T> {
             }
         }
         return this;
+    }
+
+    /**
+     * @return the 26 adjacent nodes (including diagonals) to this one, if available.
+     */
+    public Collection<OcTree<T>> getAdjacentLeaves() {
+        Set<OcTree<T>> adjacentNodes = new HashSet<>();
+        if (parent != null) {
+            // Get all the nodes that share a parent with this one that aren't this one
+            for (OcTreeOctant octant : OcTreeOctant.values()) {
+                adjacentNodes.add(parent.getChild(octant));
+            }
+            adjacentNodes.remove(this);
+
+            if (parent.getParent() != null) {
+                switch (parent.getDirectRelationship(this)) {
+                    case LEFTBACKUP:
+                        break;
+                    case LEFTFRONTUP:
+
+                        break;
+                    case RIGHTBACKUP:
+
+                        break;
+                    case LEFTBACKDOWN:
+
+                        break;
+                    case RIGHTFRONTUP:
+
+                        break;
+                    case LEFTFRONTDOWN:
+
+                        break;
+                    case RIGHTBACKDOWN:
+
+                        break;
+                    case RIGHTFRONTDOWN:
+
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        return adjacentNodes;
     }
 
     public void add(T obj) {

@@ -7,13 +7,13 @@ import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import tools.QueryRunner;
 
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.ResourceBundle;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class ColorClientController implements Initializable {
@@ -52,16 +52,27 @@ public class ColorClientController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Set up the color column to:
+        //     a) Sort by how far a color is from the currently selected one, if applicable
+        //     b) Use a special cell factory to show the color in the cell
         colorColumn.setCellValueFactory(data -> data.getValue().getColorProperty());
         colorColumn.setComparator((a, b) -> {
             Color picked = ColorUtils.fromFxColor(picker.getValue());
             return a.distanceTo(picked) > b.distanceTo(picked) ? 1 : 0;
         });
         colorColumn.setCellFactory(column -> new ColorCell());
+
+        // Set up the name column to get the name
         nameColumn.setCellValueFactory(data -> data.getValue().getNameProperty());
+
+        // Set up the frequency column to get the frequency
         frequencyColumn.setCellValueFactory(data -> data.getValue().getFrequencyProperty());
+
+        // Make the color picker and text field not affect layout when they're hidden
         picker.managedProperty().bind(picker.visibleProperty());
         textSearch.managedProperty().bind(textSearch.visibleProperty());
+
+        // Search behavior
         searchToggle.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == colorButton) {
                 picker.setVisible(true);
@@ -73,6 +84,9 @@ public class ColorClientController implements Initializable {
                 textSearchAction();
             }
         });
+
+        // Auto-scroll console to bottom
+        console.textProperty().addListener(((observable, oldValue, newValue) -> console.setScrollTop(Double.MAX_VALUE)));
     }
 
     private void updateTable(Collection<ColorNamePairWrapper> items) {
@@ -82,16 +96,18 @@ public class ColorClientController implements Initializable {
     }
 
     private void logToConsole(String toLog) {
-        console.setText(console.getText() + toLog + "\n");
+        console.appendText(toLog + "\n");
         System.out.println(toLog);
     }
 
     @FXML
     private void loadFromDatabase() {
         Platform.runLater(() -> logToConsole("OcTree cleared... querying database."));
-        Platform.runLater(() -> {
-            data.clear();
-            ResultSet colors = DatabaseManager.runQuery(COLORS_BY_NAME_FREQ);
+        data.clear();
+        QueryTimer timer = new QueryTimer(time -> Platform.runLater(() -> logToConsole(String.format("Query running... %.2fs", time))),
+                time -> Platform.runLater(() -> logToConsole(String.format("Finished database query in %.2fs", time))), 2000);
+        timer.start();
+        QueryRunner runner = new QueryRunner(COLORS_BY_NAME_FREQ, colors -> {
             try {
                 while (colors.next()) {
                     int r = colors.getInt("r");
@@ -102,13 +118,15 @@ public class ColorClientController implements Initializable {
                     ColorNamePair pair = new ColorNamePair(new Color(r, g, b), colorname, frequency);
                     data.add(pair);
                 }
-                logToConsole("Loaded " + data.size() + " colors into OcTree.");
+                Platform.runLater(() -> logToConsole("Loaded " + data.size() + " colors into OcTree."));
             } catch (SQLException e) {
                 e.printStackTrace();
                 System.out.println(e.getSQLState());
             }
+            Platform.runLater(this::colorPickerAction);
+            timer.finish();
         });
-        Platform.runLater(this::colorPickerAction);
+        runner.start();
     }
 
 //    @FXML
@@ -210,6 +228,37 @@ public class ColorClientController implements Initializable {
             } else {
                 setStyle("-fx-background-color: inherit");
             }
+        }
+    }
+
+    //TODO This should probably create new Timer objects, since cancelled Timers can't be restarted
+    private class QueryTimer extends Timer {
+        private long startTime;
+        private Consumer<Double> task;
+        private Consumer<Double> finish;
+        private long interval;
+
+        public QueryTimer(Consumer<Double> scheduled, Consumer<Double> finish, long interval) {
+            super("Database Query Timer", true);
+            this.task = scheduled;
+            this.finish = finish;
+            this.interval = interval;
+        }
+
+        public void start() {
+            startTime = System.nanoTime();
+            scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    double elapsedTime = (System.nanoTime() - startTime) / 1_000_000_000.;
+                    task.accept(elapsedTime);
+                }
+            }, interval, interval);
+        }
+
+        public void finish() {
+            cancel();
+            finish.accept((System.nanoTime() - startTime) / 1_000_000_000.);
         }
     }
 }
