@@ -5,7 +5,6 @@ import Data.ColorNamePair;
 import Data.DatabaseManager;
 
 import java.io.*;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;

@@ -3,7 +3,6 @@ package ColorClient;
 import Data.*;
 import javafx.application.Platform;
 import javafx.beans.property.*;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -24,7 +23,7 @@ public class ColorClientController implements Initializable {
 
     public static final String COLORS_BY_NAME =
             "SELECT answers.r, answers.g, answers.b, names.colorname, names.numusers FROM jdorsey.answers, jdorsey.names WHERE names.colorname = answers.colorname";
-    public static final String COLORS_BY_NAME_FREQ = "SELECT AVG(answers.r) AS r, AVG(answers.g) AS g, AVG(answers.b) AS b, names.numusers, names.colorname FROM jdorsey.answers, jdorsey.names WHERE answers.colorname = names.colorname AND names.numusers >= 1 GROUP BY names.colorname, names.numusers";
+    public static final String COLORS_BY_NAME_FREQ = "SELECT AVG(answers.r) AS r, AVG(answers.g) AS g, AVG(answers.b) AS b, names.numusers, names.colorname FROM jdorsey.answers, jdorsey.names WHERE answers.colorname = names.colorname AND names.numusers >= 2 GROUP BY names.colorname, names.numusers";
 
     @FXML
     private ColorPicker picker;
