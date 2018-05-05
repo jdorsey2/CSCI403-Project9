@@ -1,4 +1,4 @@
-package ColorClient;
+package colorclient;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -13,7 +13,7 @@ public class ColorClient extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("ColorClient.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("colorclient.fxml"));
 
         primaryStage.setTitle("XKCD Color Survey Explorer");
         primaryStage.setScene(new Scene(root, 800, 600));

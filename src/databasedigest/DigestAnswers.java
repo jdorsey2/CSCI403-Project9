@@ -1,8 +1,8 @@
-package DatabaseDigest;
+package databasedigest;
 
-import Data.Color;
-import Data.ColorNamePair;
-import Data.DatabaseManager;
+import data.Color;
+import data.ColorNamePair;
+import data.DatabaseManager;
 
 import java.io.*;
 import java.sql.ResultSet;

@@ -1,8 +1,8 @@
-package ColorClient;
+package colorclient;
 
-import Data.Color;
-import Data.ColorNamePair;
-import Data.Point3D;
+import data.Color;
+import data.ColorNamePair;
+import data.Point3D;
 
 public class ColorUtils {
     private ColorUtils() {

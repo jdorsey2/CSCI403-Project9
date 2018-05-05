@@ -1,7 +1,7 @@
-package Auxiliary;
+package tools;
 
-import ColorClient.ColorUtils;
-import Data.*;
+import colorclient.ColorUtils;
+import data.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

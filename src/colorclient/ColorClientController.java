@@ -1,6 +1,6 @@
-package ColorClient;
+package colorclient;
 
-import Data.*;
+import data.*;
 import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.beans.value.ObservableValue;

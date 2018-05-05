@@ -1,4 +1,4 @@
-package Data;
+package data;
 
 public class Point3D {
     private double x;
