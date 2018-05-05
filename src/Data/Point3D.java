@@ -18,7 +18,11 @@ public class Point3D {
     }
 
     public Point3D(int v) {
-        x = y = z = v;
+        this(v, v, v);
+    }
+
+    public Point3D(double v) {
+        this(v, v, v);
     }
 
     public static Point3D zero() {

@@ -1,13 +1,22 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="ColorClient.ColorClientController">
     <left>
         <BorderPane prefWidth="250">
             <top>
                 <VBox>
-                    <ColorPicker fx:id="picker" onAction="#colorPickerAction"/>
-                    <Button text="Load from DB" onAction="#loadFromDatabase"/>
+                    <fx:define>
+                        <ToggleGroup fx:id="searchToggle"/>
+                    </fx:define>
+                    <HBox>
+                        <ToggleButton fx:id="colorButton" prefWidth="125" toggleGroup="$searchToggle" selected="true" text="Color"/>
+                        <ToggleButton fx:id="textButton" prefWidth="125" toggleGroup="$searchToggle" text="Text"/>
+                    </HBox>
+                    <ColorPicker fx:id="picker" prefWidth="250" onAction="#colorPickerAction"/>
+                    <TextField fx:id="textSearch" promptText="Enter Search Text" prefWidth="250" visible="false" onKeyReleased="#textSearchAction"/>
+                    <Button text="Load from DB" prefWidth="250" onAction="#loadFromDatabase"/>
                 </VBox>
             </top>
             <center>
