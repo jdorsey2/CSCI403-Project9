@@ -2,7 +2,7 @@ package databasedigest;
 
 import data.Color;
 import data.ColorNamePair;
-import data.DatabaseManager;
+import tools.DatabaseManager;
 
 import java.io.*;
 import java.sql.ResultSet;

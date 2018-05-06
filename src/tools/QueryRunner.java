@@ -1,7 +1,5 @@
 package tools;
 
-import data.DatabaseManager;
-
 import java.sql.ResultSet;
 import java.util.function.Consumer;
 

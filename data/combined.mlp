@@ -1,7 +1,7 @@
 <!DOCTYPE MeshLabDocument>
 <MeshLabProject>
  <MeshGroup>
-  <MLMesh label="cloud_gt50.ply" filename="cloud_gt50.ply">
+  <MLMesh filename="cloud_gt50.ply" label="cloud_gt50.ply">
    <MLMatrix44>
 1 0 0 0 
 0 1 0 0 
@@ -9,7 +9,7 @@
 0 0 0 1 
 </MLMatrix44>
   </MLMesh>
-  <MLMesh label="cloud_gt100.ply" filename="cloud_gt100.ply">
+  <MLMesh filename="cloud_gt100.ply" label="cloud_gt100.ply">
    <MLMatrix44>
 1 0 0 0 
 0 1 0 0 
@@ -17,7 +17,7 @@
 0 0 0 1 
 </MLMatrix44>
   </MLMesh>
-  <MLMesh label="cloud_gt150.ply" filename="cloud_gt150.ply">
+  <MLMesh filename="cloud_gt150.ply" label="cloud_gt150.ply">
    <MLMatrix44>
 1 0 0 0 
 0 1 0 0 
@@ -25,7 +25,7 @@
 0 0 0 1 
 </MLMatrix44>
   </MLMesh>
-  <MLMesh label="cloud_gt200.ply" filename="cloud_gt200.ply">
+  <MLMesh filename="cloud_gt200.ply" label="cloud_gt200.ply">
    <MLMatrix44>
 1 0 0 0 
 0 1 0 0 
@@ -33,7 +33,7 @@
 0 0 0 1 
 </MLMatrix44>
   </MLMesh>
-  <MLMesh label="cloud_gt250.ply" filename="cloud_gt250.ply">
+  <MLMesh filename="cloud_gt250.ply" label="cloud_gt250.ply">
    <MLMatrix44>
 1 0 0 0 
 0 1 0 0 
@@ -41,7 +41,7 @@
 0 0 0 1 
 </MLMatrix44>
   </MLMesh>
-  <MLMesh label="cloud_gt300.ply" filename="cloud_gt300.ply">
+  <MLMesh filename="cloud_gt300.ply" label="cloud_gt300.ply">
    <MLMatrix44>
 1 0 0 0 
 0 1 0 0 
@@ -49,7 +49,7 @@
 0 0 0 1 
 </MLMatrix44>
   </MLMesh>
-  <MLMesh label="cloud_gt350.ply" filename="cloud_gt350.ply">
+  <MLMesh filename="cloud_gt350.ply" label="cloud_gt350.ply">
    <MLMatrix44>
 1 0 0 0 
 0 1 0 0 
@@ -57,7 +57,7 @@
 0 0 0 1 
 </MLMatrix44>
   </MLMesh>
-  <MLMesh label="cloud_gt400.ply" filename="cloud_gt400.ply">
+  <MLMesh filename="cloud_gt400.ply" label="cloud_gt400.ply">
    <MLMatrix44>
 1 0 0 0 
 0 1 0 0 
@@ -65,7 +65,15 @@
 0 0 0 1 
 </MLMatrix44>
   </MLMesh>
-  <MLMesh label="cloud_gt1000.ply" filename="cloud_gt1000.ply">
+  <MLMesh filename="cloud_gt1000.ply" label="cloud_gt1000.ply">
+   <MLMatrix44>
+1 0 0 0 
+0 1 0 0 
+0 0 1 0 
+0 0 0 1 
+</MLMatrix44>
+  </MLMesh>
+  <MLMesh filename="cloud_gt50_stddev_culled.ply" label="cloud_gt50_stddev_culled.ply">
    <MLMatrix44>
 1 0 0 0 
 0 1 0 0 

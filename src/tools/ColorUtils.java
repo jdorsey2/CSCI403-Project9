@@ -1,4 +1,4 @@
-package colorclient;
+package tools;
 
 import data.Color;
 import data.ColorNamePair;

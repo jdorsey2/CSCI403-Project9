@@ -1,4 +1,7 @@
-package data;
+package tools;
+
+import data.ColorNamePair;
+import data.Point3D;
 
 import java.io.BufferedWriter;
 import java.io.File;
