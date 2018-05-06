@@ -49,7 +49,7 @@ public class ColorClientController implements Initializable {
     private ChangeListener<Toggle> toggleChangeListener;
 
     public ColorClientController() {
-        data = new OcTree<>(Point3D.zero(), new Point3D(256.1), ColorUtils::toRGBSpace, 3);
+        data = new OcTree<>(Point3D.zero(), new Point3D(256.1), ColorUtils::toRGBSpace, 4);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class ColorClientController implements Initializable {
         colorColumn.setComparator((a, b) -> {
             if (searchToggle.getSelectedToggle() == picker) {
                 Color picked = ColorUtils.fromFxColor(picker.getValue());
-                return a.distanceTo(picked) < b.distanceTo(picked) ? 1 : -1;
+                return a.distanceTo(picked) > b.distanceTo(picked) ? 1 : -1;
             } else {
                 String webColorA = ColorUtils.toHexColor(a);
                 String webColorB = ColorUtils.toHexColor(b);
@@ -92,8 +92,9 @@ public class ColorClientController implements Initializable {
                 textSearchAction();
             }
             if (newValue == null) {
-                // It's hacky, but this causes the selectToggle call not to fire the changelistener
-                // which just avoids an unnecessary call to colorPickerAction() or textSearchAction().
+                // It's hacky, but this business with the changeListener causes the selectToggle call
+                // not to fire the changelistener which just avoids an unnecessary call to
+                // colorPickerAction() or textSearchAction().
                 searchToggle.selectedToggleProperty().removeListener(toggleChangeListener);
                 searchToggle.selectToggle(oldValue);
                 searchToggle.selectedToggleProperty().addListener(toggleChangeListener);
@@ -181,14 +182,14 @@ public class ColorClientController implements Initializable {
 
         // Convert the items to wrapped items
         Collection<ColorNamePair> values = tree.collectValues();
-        logToConsole("Retrieved " + values.size() + " nodes.");
+        logToConsole("Retrieved " + values.size() + " colors.");
         if (values.size() < TABLE_MAX_SIZE) {
             int sizeBeforeAdjacent = values.size();
             logToConsole("Retrieving adjacent nodes for " + c);
             tree.getAdjacentLeaves().forEach(leaf -> values.addAll(leaf.collectValues()));
             logToConsole("Retrieved " + (values.size() - sizeBeforeAdjacent) + " colors from adjacent nodes.");
         }
-        Collection<ColorNamePairWrapper> items = tree.collectValues().parallelStream()
+        Collection<ColorNamePairWrapper> items = values.parallelStream()
                 .limit(TABLE_MAX_SIZE)
                 .sorted(Comparator.comparing(pair -> Point3D.manhattanDistance(pickerPosition, tree.getCordMapper().apply(pair))))
                 .map(ColorNamePairWrapper::new)
