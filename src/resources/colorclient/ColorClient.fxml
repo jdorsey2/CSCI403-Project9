@@ -29,7 +29,7 @@
     <center>
         <TableView fx:id="table">
             <columns>
-                <TableColumn text="Color" prefWidth="100" sortable="false" fx:id="colorColumn"/>
+                <TableColumn text="Color" prefWidth="100" fx:id="colorColumn"/>
                 <TableColumn text="Name" prefWidth="320" fx:id="nameColumn"/>
                 <TableColumn text="Frequency" prefWidth="120" fx:id="frequencyColumn"/>
             </columns>

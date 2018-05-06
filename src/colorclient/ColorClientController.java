@@ -3,6 +3,7 @@ package colorclient;
 import data.*;
 import javafx.application.Platform;
 import javafx.beans.property.*;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -21,9 +22,9 @@ public class ColorClientController implements Initializable {
     public static final int TABLE_MAX_SIZE = 1000;
     public static OcTree<ColorNamePair> data;
 
-    public static final String COLORS_BY_NAME =
+    private static final String COLORS_BY_NAME =
             "SELECT answers.r, answers.g, answers.b, names.colorname, names.numusers FROM jdorsey.answers, jdorsey.names WHERE names.colorname = answers.colorname";
-    public static final String COLORS_BY_NAME_FREQ = "SELECT AVG(answers.r) AS r, AVG(answers.g) AS g, AVG(answers.b) AS b, names.numusers, names.colorname FROM jdorsey.answers, jdorsey.names WHERE answers.colorname = names.colorname AND names.numusers >= 2 GROUP BY names.colorname, names.numusers";
+    private static final String COLORS_BY_NAME_FREQ = "SELECT AVG(answers.r) AS r, AVG(answers.g) AS g, AVG(answers.b) AS b, names.numusers, names.colorname FROM jdorsey.answers, jdorsey.names WHERE answers.colorname = names.colorname AND names.numusers >= 1 GROUP BY names.colorname, names.numusers HAVING (STDDEV_SAMP(r) < 60 OR STDDEV_SAMP(g) < 60 OR STDDEV_SAMP(b) < 60) OR (STDDEV_SAMP(r) IS NULL OR STDDEV_SAMP(g) IS NULL OR STDDEV_SAMP(b) IS NULL);";
 
     @FXML
     private ColorPicker picker;
@@ -45,6 +46,7 @@ public class ColorClientController implements Initializable {
     private ToggleButton colorButton;
     @FXML
     private ToggleButton textButton;
+    private ChangeListener<Toggle> toggleChangeListener;
 
     public ColorClientController() {
         data = new OcTree<>(Point3D.zero(), new Point3D(256.1), ColorUtils::toRGBSpace, 3);
@@ -57,8 +59,14 @@ public class ColorClientController implements Initializable {
         //     b) Use a special cell factory to show the color in the cell
         colorColumn.setCellValueFactory(data -> data.getValue().getColorProperty());
         colorColumn.setComparator((a, b) -> {
-            Color picked = ColorUtils.fromFxColor(picker.getValue());
-            return a.distanceTo(picked) > b.distanceTo(picked) ? 1 : 0;
+            if (searchToggle.getSelectedToggle() == picker) {
+                Color picked = ColorUtils.fromFxColor(picker.getValue());
+                return a.distanceTo(picked) < b.distanceTo(picked) ? 1 : -1;
+            } else {
+                String webColorA = ColorUtils.toHexColor(a);
+                String webColorB = ColorUtils.toHexColor(b);
+                return webColorA.compareTo(webColorB);
+            }
         });
         colorColumn.setCellFactory(column -> new ColorCell());
 
@@ -73,7 +81,7 @@ public class ColorClientController implements Initializable {
         textSearch.managedProperty().bind(textSearch.visibleProperty());
 
         // Search behavior
-        searchToggle.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
+        toggleChangeListener = (observable, oldValue, newValue) -> {
             if (newValue == colorButton) {
                 picker.setVisible(true);
                 textSearch.setVisible(false);
@@ -83,7 +91,15 @@ public class ColorClientController implements Initializable {
                 textSearch.setVisible(true);
                 textSearchAction();
             }
-        });
+            if (newValue == null) {
+                // It's hacky, but this causes the selectToggle call not to fire the changelistener
+                // which just avoids an unnecessary call to colorPickerAction() or textSearchAction().
+                searchToggle.selectedToggleProperty().removeListener(toggleChangeListener);
+                searchToggle.selectToggle(oldValue);
+                searchToggle.selectedToggleProperty().addListener(toggleChangeListener);
+            }
+        };
+        searchToggle.selectedToggleProperty().addListener(toggleChangeListener);
 
         // Auto-scroll console to bottom
         console.textProperty().addListener(((observable, oldValue, newValue) -> console.setScrollTop(Double.MAX_VALUE)));
@@ -162,11 +178,19 @@ public class ColorClientController implements Initializable {
         ColorNamePair pickerPair = ColorUtils.toColorNamePair(c);
         OcTree<ColorNamePair> tree = data.getOctantBy(data.getCordMapper().apply(pickerPair));
         Point3D pickerPosition = tree.getCordMapper().apply(pickerPair);
-        logToConsole("Updating table...");
+
         // Convert the items to wrapped items
+        Collection<ColorNamePair> values = tree.collectValues();
+        logToConsole("Retrieved " + values.size() + " nodes.");
+        if (values.size() < TABLE_MAX_SIZE) {
+            int sizeBeforeAdjacent = values.size();
+            logToConsole("Retrieving adjacent nodes for " + c);
+            tree.getAdjacentLeaves().forEach(leaf -> values.addAll(leaf.collectValues()));
+            logToConsole("Retrieved " + (values.size() - sizeBeforeAdjacent) + " colors from adjacent nodes.");
+        }
         Collection<ColorNamePairWrapper> items = tree.collectValues().parallelStream()
                 .limit(TABLE_MAX_SIZE)
-                .sorted(Comparator.comparing(pair -> Point3D.distance(pickerPosition, tree.getCordMapper().apply(pair))))
+                .sorted(Comparator.comparing(pair -> Point3D.manhattanDistance(pickerPosition, tree.getCordMapper().apply(pair))))
                 .map(ColorNamePairWrapper::new)
                 .collect(Collectors.toList());
         updateTable(items);

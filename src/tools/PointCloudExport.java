@@ -11,7 +11,7 @@ import java.util.Scanner;
 public class PointCloudExport {
     private static final String OUTPUT_PREFIX = "./data/";
     private static final String COLORS_BY_NAME_FREQUENCY_QUERY =
-            "SELECT AVG(answers.r) AS r, AVG(answers.g) AS g, AVG(answers.b) AS b, names.numusers, names.colorname FROM jdorsey.answers, jdorsey.names WHERE answers.colorname = names.colorname AND names.numusers > 1000 GROUP BY names.colorname, names.numusers";
+            "SELECT AVG(answers.r) AS r, AVG(answers.g) AS g, AVG(answers.b) AS b, names.numusers, names.colorname FROM jdorsey.answers, jdorsey.names WHERE answers.colorname = names.colorname AND names.numusers > 50 GROUP BY names.colorname, names.numusers HAVING (STDDEV_SAMP(r) < 60 AND STDDEV_SAMP(g) < 60 AND STDDEV_SAMP(b) < 60) OR (STDDEV_SAMP(r) IS NULL OR STDDEV_SAMP(g) IS NULL OR STDDEV_SAMP(b) IS NULL);";
 
     public static void main(String[] args) {
         Scanner keyboard = new Scanner(System.in);

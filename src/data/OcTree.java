@@ -18,6 +18,7 @@ public class OcTree<T> {
 
     private Point3D min;
     private Point3D max;
+    private Point3D center;
     private int remainingDepth;
     private Function<T, Point3D> cordMapper;
     private Collection<T> contents;
@@ -31,6 +32,7 @@ public class OcTree<T> {
     private OcTree(Point3D min, Point3D max, Function<T, Point3D> cordMapper, OcTree<T> parent, int remainingDepth) {
         this.min = min;
         this.max = max;
+        this.center = min.add(max.subtract(min).divide(2));
         this.parent = parent;
         this.cordMapper = cordMapper;
         this.contents = new ArrayList<>();
@@ -68,7 +70,11 @@ public class OcTree<T> {
                 }
             }
         }
-        return this;
+        if (parent != null) {
+            return this;
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -81,37 +87,215 @@ public class OcTree<T> {
             for (OcTreeOctant octant : OcTreeOctant.values()) {
                 adjacentNodes.add(parent.getChild(octant));
             }
-            adjacentNodes.remove(this);
+
+            // This part is to get the remaining 19 nodes
+            OcTree<T> root = parent;
+            while (root.getParent() != null) {
+                root = root.getParent();
+            }
+            double sideLength = max.subtract(min).getX();
 
             if (parent.getParent() != null) {
                 switch (parent.getDirectRelationship(this)) {
                     case LEFTBACKUP:
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, 0, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, 0, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, -sideLength, -sideLength))));
+
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, -sideLength, 0))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, -sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, 0, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, 0, 0))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, 0, sideLength))));
+
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, sideLength, 0))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, -sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, -sideLength, 0))));
+
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, -sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, -sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, -sideLength, 0))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, -sideLength, sideLength))));
                         break;
                     case LEFTFRONTUP:
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, 0, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, 0, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, 0, 0))));
 
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, sideLength, 0))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, sideLength, 0))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, -sideLength, -sideLength))));
+
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, -sideLength, 0))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, -sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, 0, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, sideLength, 0))));
+
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, -sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, -sideLength, 0))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, -sideLength, sideLength))));
                         break;
                     case RIGHTBACKUP:
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, 0, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, 0, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, 0, 0))));
 
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, sideLength, 0))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, 0, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, -sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, -sideLength, 0))));
+
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, -sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, 0, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, -sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, -sideLength, 0))));
+
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, -sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, -sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, -sideLength, 0))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, -sideLength, sideLength))));
                         break;
                     case LEFTBACKDOWN:
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, 0, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, -sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, -sideLength, 0))));
 
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, -sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, 0, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, 0, 0))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, 0, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, sideLength, -sideLength))));
+
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, sideLength, 0))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, -sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, -sideLength, 0))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, -sideLength, sideLength))));
+
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, -sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, -sideLength, 0))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, -sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, 0, -sideLength))));
                         break;
                     case RIGHTFRONTUP:
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, 0, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, 0, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, 0, 0))));
 
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, sideLength, 0))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, sideLength, 0))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, 0, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, sideLength, -sideLength))));
+
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, -sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, 0, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, sideLength, 0))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, sideLength, sideLength))));
+
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, -sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, -sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, -sideLength, 0))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, -sideLength, sideLength))));
                         break;
                     case LEFTFRONTDOWN:
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, 0, 0))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, sideLength, 0))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, sideLength, 0))));
 
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, 0, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, -sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, -sideLength, sideLength))));
+
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, 0, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, 0, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, sideLength, 0))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, sideLength, sideLength))));
+
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, -sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, -sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, -sideLength, 0))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, 0, -sideLength))));
                         break;
                     case RIGHTBACKDOWN:
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, 0, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, -sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, -sideLength, 0))));
 
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, -sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, 0, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, 0, 0))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, 0, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, sideLength, -sideLength))));
+
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, sideLength, 0))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, -sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, -sideLength, 0))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, -sideLength, sideLength))));
+
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, -sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, -sideLength, 0))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, -sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, 0, -sideLength))));
                         break;
                     case RIGHTFRONTDOWN:
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, 0, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, 0, 0))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, sideLength, 0))));
 
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, sideLength, 0))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, 0, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, -sideLength, -sideLength))));
+
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, 0, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, sideLength, 0))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(-sideLength, sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, -sideLength, -sideLength))));
+
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, -sideLength, -sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, -sideLength, 0))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(sideLength, -sideLength, sideLength))));
+                        adjacentNodes.add(root.getOctantBy(center.add(new Point3D(0, 0, -sideLength))));
                         break;
                     default:
                         break;
                 }
             }
+
+            adjacentNodes.remove(this);
+            adjacentNodes.remove(null);
         }
 
         return adjacentNodes;
@@ -167,38 +351,38 @@ public class OcTree<T> {
     private void buildSubtrees() {
         children = new HashMap<>();
 
-        double sideLength = max.subtract(min).divide(2).getX();
+        double newSideLength = max.subtract(min).divide(2).getX();
         Point3D center = min.add(max.subtract(min).divide(2));
 
         OcTree<T> leftBackDown = new OcTree<>(min, center, cordMapper, this, remainingDepth - 1);
 
         OcTree<T> leftBackUp = new OcTree<>(
-                min.add(new Point3D(0, 0, sideLength)),
-                center.add(new Point3D(0, 0, sideLength)), cordMapper, this, remainingDepth - 1);
+                min.add(new Point3D(0, 0, newSideLength)),
+                center.add(new Point3D(0, 0, newSideLength)), cordMapper, this, remainingDepth - 1);
 
         OcTree<T> leftFrontDown = new OcTree<>(
-                min.add(new Point3D(0, sideLength, 0)),
-                center.add(new Point3D(0, sideLength, 0)), cordMapper, this, remainingDepth - 1);
+                min.add(new Point3D(0, newSideLength, 0)),
+                center.add(new Point3D(0, newSideLength, 0)), cordMapper, this, remainingDepth - 1);
 
         OcTree<T> leftFrontUp = new OcTree<>(
-                min.add(new Point3D(0, sideLength, sideLength)),
-                center.add(new Point3D(0, sideLength, sideLength)), cordMapper, this, remainingDepth - 1);
+                min.add(new Point3D(0, newSideLength, newSideLength)),
+                center.add(new Point3D(0, newSideLength, newSideLength)), cordMapper, this, remainingDepth - 1);
 
         OcTree<T> rightBackDown = new OcTree<>(
-                min.add(new Point3D(sideLength, 0, 0)),
-                center.add(new Point3D(sideLength, 0, 0)), cordMapper, this, remainingDepth - 1);
+                min.add(new Point3D(newSideLength, 0, 0)),
+                center.add(new Point3D(newSideLength, 0, 0)), cordMapper, this, remainingDepth - 1);
 
         OcTree<T> rightBackUp = new OcTree<>(
-                min.add(new Point3D(sideLength, 0, sideLength)),
-                center.add(new Point3D(sideLength, 0, sideLength)), cordMapper, this, remainingDepth - 1);
+                min.add(new Point3D(newSideLength, 0, newSideLength)),
+                center.add(new Point3D(newSideLength, 0, newSideLength)), cordMapper, this, remainingDepth - 1);
 
         OcTree<T> rightFrontDown = new OcTree<>(
-                min.add(new Point3D(sideLength, sideLength, 0)),
-                center.add(new Point3D(sideLength, sideLength, 0)), cordMapper, this, remainingDepth - 1);
+                min.add(new Point3D(newSideLength, newSideLength, 0)),
+                center.add(new Point3D(newSideLength, newSideLength, 0)), cordMapper, this, remainingDepth - 1);
 
         OcTree<T> rightFrontUp = new OcTree<>(
-                min.add(new Point3D(sideLength, sideLength, sideLength)),
-                center.add(new Point3D(sideLength, sideLength, sideLength)), cordMapper, this, remainingDepth - 1);
+                min.add(new Point3D(newSideLength, newSideLength, newSideLength)),
+                center.add(new Point3D(newSideLength, newSideLength, newSideLength)), cordMapper, this, remainingDepth - 1);
 
         children.put(OcTreeOctant.LEFTBACKDOWN, leftBackDown);
         children.put(OcTreeOctant.LEFTBACKUP, leftBackUp);
